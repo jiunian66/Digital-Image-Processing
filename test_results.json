@@ -1,0 +1,72 @@
+[
+  {
+    "image": "Image_1.jpg",
+    "true_class": "apple",
+    "predicted_class": "apple",
+    "confidence": 0.8839370608329773,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "banana",
+    "predicted_class": "banana",
+    "confidence": 0.9471359848976135,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "beetroot",
+    "predicted_class": "beetroot",
+    "confidence": 0.9369686245918274,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "bell pepper",
+    "predicted_class": "bell pepper",
+    "confidence": 0.9481145143508911,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "cabbage",
+    "predicted_class": "cabbage",
+    "confidence": 0.909610390663147,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "capsicum",
+    "predicted_class": "capsicum",
+    "confidence": 0.8451546430587769,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "carrot",
+    "predicted_class": "carrot",
+    "confidence": 0.9344629049301147,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "cauliflower",
+    "predicted_class": "cauliflower",
+    "confidence": 0.8968920707702637,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "chilli pepper",
+    "predicted_class": "chilli pepper",
+    "confidence": 0.865259051322937,
+    "correct": true
+  },
+  {
+    "image": "Image_1.jpg",
+    "true_class": "corn",
+    "predicted_class": "corn",
+    "confidence": 0.5389204025268555,
+    "correct": true
+  }
+]

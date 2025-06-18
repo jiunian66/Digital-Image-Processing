@@ -1,0 +1,493 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI果蔬识别系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #4CAF50;
+            border-radius: 15px;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #e8f5e8;
+            border-color: #45a049;
+        }
+
+        .upload-area.dragover {
+            background: #e8f5e8;
+            border-color: #45a049;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 40px;
+        }
+
+        .images-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .image-box {
+            text-align: center;
+        }
+
+        .image-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .image-box img:hover {
+            transform: scale(1.05);
+        }
+
+        .detections {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .detections h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .detection-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .detection-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .fruit-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4CAF50;
+            text-transform: capitalize;
+        }
+
+        .confidence {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .nutrition-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .nutrition-item {
+            text-align: center;
+            background: #f0f9f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .nutrition-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .nutrition-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .benefits {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c62828;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .images-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nutrition-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .detection-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍎 AI果蔬识别系统</h1>
+            <p>上传图片，智能识别果蔬种类并获取营养信息</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">点击选择图片或拖拽到此处</div>
+                    <div class="upload-hint">支持 JPG、PNG、GIF 格式，最大 16MB</div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">选择图片</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在识别中，请稍候...</p>
+            </div>
+
+            <div class="results-section" id="results">
+                <div class="images-container">
+                    <div class="image-box">
+                        <h3>原始图片</h3>
+                        <img id="originalImage" src="" alt="原始图片">
+                    </div>
+                    <div class="image-box">
+                        <h3>识别结果</h3>
+                        <img id="resultImage" src="" alt="识别结果">
+                    </div>
+                </div>
+
+                <div class="detections">
+                    <h3>🔍 识别详情</h3>
+                    <div id="detectionsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 拖拽上传功能
+        const uploadArea = document.querySelector('.upload-area');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            // 验证文件类型
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                showError('请选择有效的图片格式 (JPG, PNG, GIF)');
+                return;
+            }
+
+            // 验证文件大小 (16MB)
+            if (file.size > 16 * 1024 * 1024) {
+                showError('文件大小不能超过 16MB');
+                return;
+            }
+
+            // 显示加载状态
+            showLoading();
+
+            // 创建FormData并上传
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showResults(data);
+                } else {
+                    showError(data.error || '识别失败');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                showError('网络错误: ' + error.message);
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            hideError();
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showResults(data) {
+            const resultsSection = document.getElementById('results');
+            const originalImg = document.getElementById('originalImage');
+            const resultImg = document.getElementById('resultImage');
+            const detectionsList = document.getElementById('detectionsList');
+
+            // 显示图片
+            originalImg.src = 'data:image/jpeg;base64,' + data.original_image;
+            resultImg.src = 'data:image/jpeg;base64,' + data.result_image;
+
+            // 显示检测结果
+            if (data.detections && data.detections.length > 0) {
+                detectionsList.innerHTML = '';
+
+                data.detections.forEach((detection, index) => {
+                    const detectionItem = createDetectionItem(detection, index + 1);
+                    detectionsList.appendChild(detectionItem);
+                });
+            } else {
+                detectionsList.innerHTML = '<div class="no-results">未检测到果蔬，请尝试其他图片</div>';
+            }
+
+            resultsSection.style.display = 'block';
+        }
+
+        function createDetectionItem(detection, index) {
+            const item = document.createElement('div');
+            item.className = 'detection-item';
+
+            const nutrition = detection.nutrition || {};
+
+            item.innerHTML = `
+                <div class="detection-header">
+                    <span class="fruit-name">${index}. ${detection.class}</span>
+                    <span class="confidence">${(detection.confidence * 100).toFixed(1)}%</span>
+                </div>
+
+                <div class="nutrition-info">
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${nutrition.calories || 0}</div>
+                        <div class="nutrition-label">卡路里/100g</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${nutrition.vitamin_c || 0}</div>
+                        <div class="nutrition-label">维生素C (mg)</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${nutrition.fiber || 0}</div>
+                        <div class="nutrition-label">膳食纤维 (g)</div>
+                    </div>
+                </div>
+
+                <div class="benefits">
+                    <strong>营养价值:</strong> ${nutrition.benefits || '暂无信息'}
+                </div>
+            `;
+
+            return item;
+        }
+
+        function showError(message) {
+            hideError();
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `❌ ${message}`;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(errorDiv, mainContent.firstChild);
+        }
+
+        function hideError() {
+            const errors = document.querySelectorAll('.error');
+            errors.forEach(error => error.remove());
+        }
+    </script>
+</body>
+</html>
